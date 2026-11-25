@@ -30,7 +30,10 @@ export async function buildServer(client: GatewayClient): Promise<McpServer> {
   for (const mod of modules) {
     const tools: ToolDef[] = await mod.tools()
     for (const tool of tools) {
-      if (!toolAllowed(tool.name, client.allowedTools)) continue
+      // Read tools follow allowed_tools. Anything that changes a device needs an
+      // explicit match in allowed_commands, which is empty for every agent by default.
+      const patterns = tool.risk === 'read' ? client.allowedTools : client.allowedCommands
+      if (!toolAllowed(tool.name, patterns)) continue
       const input = { ...(tool.input ?? {}) }
       if (tool.risk === 'sensitive') {
         input.confirm = z.literal(true).describe('Must be true. Confirms the user asked for this action.')

@@ -13,8 +13,8 @@ Mark each step `[x]` when done.
   openssl ecparam -name prime256v1 -genkey -noout -out private-key.pem
   openssl ec -in private-key.pem -pubout -out public-key.pem
   ```
-- [ ] 5. Neon: create a free project. Copy its connection string. Then run `DATABASE_URL=... pnpm db:migrate`.
-- [ ] 6. Vercel: import the repo, add the domain from step 3, and set these env vars (see `.env.example`):
+- [x] 5. Neon: free project `mcp-gateway` (id `soft-haze-26529934`, aws-us-east-2, Postgres 18, database `neondb`) created Nov 25. Schema applied Nov 25 (9 tables). Rerun `DATABASE_URL=... pnpm db:migrate` after schema changes.
+- [ ] 6. Vercel: give the Vercel connector access to your team (it can't see it yet), or import the repo yourself. Then add the domain from step 3, and set these env vars (see `.env.example`):
   `DATABASE_URL`, `ENCRYPTION_KEY`, `ADMIN_SECRET`, `TESLA_PUBLIC_KEY` (text of `public-key.pem`), `TESLA_PARTNER_DOMAIN`, `TESLA_REDIRECT_URI`, `TESLA_API_BASE`.
 - [ ] 7. Check `https://tesla.skylerfly.com/.well-known/appspecific/com.tesla.3p.public-key.pem` shows the public key.
 - [ ] 8. developer.tesla.com: create the app (personal use). Scopes: openid, offline_access, user data, vehicle information, vehicle location, vehicle commands, vehicle charging management. Allowed origin: `https://tesla.skylerfly.com`. Redirect URI: `https://tesla.skylerfly.com/api/auth/tesla/callback`. You accept Tesla's terms here.
@@ -22,12 +22,14 @@ Mark each step `[x]` when done.
 - [ ] 10. Tesla billing: add a payment method and set a low billing limit (for example $10). The default limit is $0, which disables the app.
 - [ ] 11. Register the domain with Tesla (once): `TESLA_CLIENT_ID=... TESLA_CLIENT_SECRET=... TESLA_PARTNER_DOMAIN=tesla.skylerfly.com pnpm tesla:register`. Expect status 200.
 - [ ] 12. Sign in with Tesla: open `https://tesla.skylerfly.com/api/auth/tesla/login?key=<ADMIN_SECRET>` and approve every scope. The page should say "Tesla linked".
-- [ ] 13. Make an agent key: `DATABASE_URL=... pnpm client:create <agent-name> 'tesla_*'`. Add the URL and key to the agent.
+- [ ] 13. Make an agent key: `DATABASE_URL=... pnpm client:create <agent-name> '*'`. Add the URL and key to the agent. This key gets read tools only.
 
-## Phase 2: commands (Fly proxy). Not built yet.
+## Phase 2: commands. Tools built Nov 25; the signing proxy is not deployed yet.
 
 - [ ] Fly app with `tesla-http-proxy`, the private key as a Fly secret, and a TLS cert. About $2 to $4 a month.
+- [ ] Set `TESLA_COMMAND_PROXY_URL` (and `TESLA_COMMAND_PROXY_CA` if the cert is self-signed) in Vercel.
 - [ ] Pair the virtual key: open `https://tesla.com/_ak/tesla.skylerfly.com` on your phone, approve in the Tesla app, tap your key card in the car.
+- [ ] Give one agent commands: `DATABASE_URL=... pnpm client:create <agent-name> '*' --commands 'tesla_climate_*' 'tesla_set_*' 'tesla_charge_*'`.
 
 ## Phase 3: telemetry. Not built yet.
 

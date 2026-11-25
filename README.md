@@ -4,7 +4,7 @@ One MCP server for all my agents. One address, one bearer key per agent, a per-a
 
 Modules:
 
-- **tesla**: read and control my Tesla through Tesla Fleet API. Phase 1 has read tools only.
+- **tesla**: read and control my Tesla through Tesla Fleet API. Read tools work now. Climate and charging commands are built and wait for the signing proxy (phase 2).
 - Later: pass-through to other remote MCP servers, served under their own prefix.
 
 Runs on Vercel (Nuxt / Nitro). Data in Neon. Tesla command signing and streaming telemetry need a small Fly.io machine (phases 2 and 3). See [PLAN.md](PLAN.md).
@@ -21,6 +21,21 @@ Runs on Vercel (Nuxt / Nitro). Data in Neon. Tesla command signing and streaming
 
 Tesla bills data at 500 calls per $1, with a $10 monthly discount per account.
 
+## Commands (off for every agent until allowed)
+
+Climate: `tesla_climate_on`, `tesla_climate_off`, `tesla_set_temperature` (F or C), `tesla_set_seat_heater`, `tesla_set_seat_cooler`, `tesla_set_steering_wheel_heater`, `tesla_set_defrost`, `tesla_set_climate_keeper` (off, keep, dog, camp).
+
+Charging: `tesla_charge_start`, `tesla_charge_stop`, `tesla_set_charge_limit` (50 to 100), `tesla_set_charging_amps` (1 to 48), `tesla_charge_port_open`, `tesla_charge_port_close`.
+
+Wake: `tesla_wake_vehicle` (costs one wake, 50 per $1).
+
+Commands are signed by Tesla's `tesla-http-proxy` (set `TESLA_COMMAND_PROXY_URL`). They are never retried, because a command that times out may still have run. Commands cost 1,000 per $1.
+
+Access rules per agent:
+
+- `allowed_tools`: globs for read tools. Default `*`.
+- `allowed_commands`: globs for anything that changes the car. Default empty, so no agent can send a command until you add it.
+
 ## Connect an agent
 
 Endpoint: `https://<your-domain>/api/mcp` (streamable HTTP). Header: `Authorization: Bearer <agent key>`.
@@ -28,8 +43,9 @@ Endpoint: `https://<your-domain>/api/mcp` (streamable HTTP). Header: `Authorizat
 Make a key (shown once):
 
 ```sh
-DATABASE_URL=... pnpm client:create muse 'tesla_*'
 DATABASE_URL=... pnpm client:create research-bot 'tesla_get_*' tesla_list_vehicles
+DATABASE_URL=... pnpm client:create muse '*' --commands 'tesla_climate_*' tesla_set_temperature
+DATABASE_URL=... pnpm client:create home-agent '*' --commands 'tesla_*'
 ```
 
 Claude Code:

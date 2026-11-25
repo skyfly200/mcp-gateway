@@ -23,10 +23,12 @@ CREATE TABLE IF NOT EXISTS mcp_clients (
   id             serial PRIMARY KEY,
   name           text NOT NULL UNIQUE,
   token_hash     text NOT NULL UNIQUE,    -- sha256 hex of the bearer key
-  allowed_tools  text[] NOT NULL DEFAULT ARRAY['*'],  -- globs, e.g. 'tesla_get_*'
+  allowed_tools  text[] NOT NULL DEFAULT ARRAY['*'],  -- globs for read tools, e.g. 'tesla_get_*'
   created_at     timestamptz NOT NULL DEFAULT now(),
   revoked_at     timestamptz
 );
+-- Tools that change the car (climate, charging, locks). Empty = none, for every agent by default.
+ALTER TABLE mcp_clients ADD COLUMN IF NOT EXISTS allowed_commands text[] NOT NULL DEFAULT '{}';
 
 -- Every tool call through the gateway, for any module.
 CREATE TABLE IF NOT EXISTS command_log (

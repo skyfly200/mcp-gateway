@@ -59,7 +59,8 @@ export async function exchangeCode(code: string) {
   await saveTokens(t)
 }
 
-async function accessToken(): Promise<string> {
+/** Current owner access token, refreshed when needed. */
+export async function fleetToken(): Promise<string> {
   const rows = (await db()`SELECT refresh_token, access_token, access_expires FROM tesla_account WHERE id = 1`) as {
     refresh_token: string, access_token: string | null, access_expires: string | null
   }[]
@@ -87,7 +88,7 @@ export class TeslaError extends Error {
 export async function fleet<T = unknown>(path: string, init: RequestInit = {}): Promise<T> {
   const res = await fetch(apiBase() + path, {
     ...init,
-    headers: { ...init.headers, authorization: `Bearer ${await accessToken()}`, 'content-type': 'application/json' },
+    headers: { ...init.headers, authorization: `Bearer ${await fleetToken()}`, 'content-type': 'application/json' },
   })
   const text = await res.text()
   if (!res.ok) {

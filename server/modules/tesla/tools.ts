@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import type { GatewayModule, ToolDef } from '../../gateway/types'
 import { fleet } from './client'
+import { chargingTools, climateTools, wakeTool } from './command-tools'
 
 // Cost notes for agents (Tesla pricing, Nov 2026): data 500 calls per $1, wakes 50 per $1.
 // Read tools here never wake the car.
@@ -96,4 +97,7 @@ const tools: ToolDef[] = [
   },
 ]
 
-export const teslaModule: GatewayModule = { id: 'tesla', tools: () => tools }
+export const teslaModule: GatewayModule = {
+  id: 'tesla',
+  tools: () => [...tools, ...climateTools, ...chargingTools, wakeTool],
+}
