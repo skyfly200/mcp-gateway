@@ -1,0 +1,11 @@
+node_modules
+.nuxt
+.output
+.vercel
+.data
+dist
+.env
+.env.*
+!.env.example
+*.pem
+!**/public-key.example.pem

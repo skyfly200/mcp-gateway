@@ -1,0 +1,27 @@
+{
+  "name": "mcp-gateway",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "typecheck": "nuxt typecheck",
+    "db:migrate": "node scripts/migrate.mjs",
+    "client:create": "node scripts/create-client.mjs",
+    "tesla:register": "node scripts/register-partner.mjs",
+    "test": "node --import tsx --test test/*.test.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "@neondatabase/serverless": "^1.2.1",
+    "nuxt": "^4.7.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vue-tsc": "^3.3.14"
+  }
+}
