@@ -87,6 +87,11 @@ Every command writes a row to `command_log`: time, agent, tool, arguments, resul
 2. Fly machine with the proxy. Then climate, then charging, then lock and trunk.
 3. fleet-telemetry on the same Fly machine, writer to Neon, daily rollup, stats tools.
 4. Pass-through hub for other remote MCP servers, with per-agent allowlists.
+   - First upstream: the AI harness's own MCP servers, starting with its app launcher at `https://ai.skylerfly.com/mcp/launcher`. Plan: `docs/launcher-plan.md` in skyfly200/custom-ai-harness.
+   - Auth: one harness MCP key (works only under `/mcp/`, cannot call models), stored encrypted in `upstream_servers`. Tools are served again as `harness_*`. Create tools go in `allowed_commands` with `risk: 'sensitive'`.
+   - The gateway holds no launcher keys or cloud tokens. Those stay in the harness.
+   - The key that the harness assistant uses here gets no `harness_*` tools, so calls cannot loop.
+   - The harness Machine sleeps when idle. Wait up to 30 s for it, then tell the agent to try again in one minute.
 
 ## Risks and open points
 
